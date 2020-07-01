@@ -2,6 +2,7 @@ package org.github.process.util;
 
 import com.jcraft.jsch.*;
 import lombok.extern.slf4j.Slf4j;
+import org.github.process.thread.FileCompleteListener;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -9,6 +10,7 @@ import java.util.List;
 import java.util.Properties;
 import java.util.Vector;
 import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * @author zhilin
@@ -41,8 +43,10 @@ public class ShellThreadPool {
      * 初始化线程池
      */
     void initThreadPool() {
-//        this.pool = new ThreadPoolExecutor(5, 10, 10, TimeUnit.SECONDS, new LinkedBlockingQueue<>(5));
-        this.pool = Executors.newFixedThreadPool(3);
+        this.pool = new ThreadPoolExecutor(5, 10, 10,
+                TimeUnit.SECONDS,
+                new LinkedBlockingQueue<>(5));
+//        this.pool = Executors.newFixedThreadPool(3);
     }
 
     /**
@@ -223,8 +227,20 @@ public class ShellThreadPool {
             // 获取sftp通道
             sftp = (ChannelSftp) sshSession.openChannel("sftp");
             sftp.connect();
-            fileInputStream = new FileInputStream(new File(source));
-            sftp.put(fileInputStream,target);
+            File file = new File(source);
+            AtomicLong count = new AtomicLong(0);
+            pool.submit(new FileCompleteListener(count,file.length()));
+            fileInputStream = new FileInputStream(file);
+            OutputStream outputStream = sftp.put(target);
+            byte[] bytes = new byte[1024 * 1024];
+            int n = 0;
+            while ((n = fileInputStream.read(bytes,0,bytes.length))!= -1){
+                outputStream.write(bytes,0,n);
+                count.addAndGet(n);
+            }
+            outputStream.flush();
+            outputStream.close();
+
         }catch (Exception e){
             e.printStackTrace();
         }finally {
@@ -237,7 +253,7 @@ public class ShellThreadPool {
                 }
             }
         }
-        log.info("文件上传成功");
+        log.info("文件上传成功: 100%");
     }
 
     /**

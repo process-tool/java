@@ -9,7 +9,7 @@ import java.util.HashMap;
  */
 public class Configuration {
     /////////////////////////////////
-    ///////// FTP 配置///////////////
+    ///////// FTP 配置和 SSH统一配置///////////////
     ////////////////////////////////
 
     public static final String FTP_HOST = "192.168.66.168";
@@ -20,9 +20,4 @@ public class Configuration {
 
     public static final String FTP_PASSWORD = "root";
 
-    /////////////////////////////////
-    ///////// SSH 配置///////////////
-    ////////////////////////////////
-
-    public static final String SHELL_HOST = "127.0.0.1";
 }

@@ -25,7 +25,7 @@ public class ProcessBootStrap {
     /**
      * 流程存放阻塞式列队
      */
-    private LinkedBlockingQueue<AbstractProcess> queue = new LinkedBlockingQueue<AbstractProcess>();
+    private final LinkedBlockingQueue<AbstractProcess> queue = new LinkedBlockingQueue<AbstractProcess>();
 
     private Integer processSize = 0;
 
@@ -34,7 +34,7 @@ public class ProcessBootStrap {
     /**
      * 执行线程池
      */
-    private ThreadPoolExecutor singleThreadExecutor = new ThreadPoolExecutor(1, 1,
+    private final ThreadPoolExecutor singleThreadExecutor = new ThreadPoolExecutor(1, 1,
             0L, TimeUnit.MILLISECONDS,
             new LinkedBlockingQueue<Runnable>(),
             new DefaultFactory());
@@ -42,7 +42,7 @@ public class ProcessBootStrap {
     /**
      * Shell线程池
      */
-    private ShellThreadPool shellThreadPool = new ShellThreadPool(FTP_HOST,FTP_PORT,FTP_USERNAME,FTP_PASSWORD);
+    private final ShellThreadPool shellThreadPool = new ShellThreadPool(FTP_HOST,FTP_PORT,FTP_USERNAME,FTP_PASSWORD);
 
     /**
      * 添加流程
@@ -104,7 +104,8 @@ public class ProcessBootStrap {
     }
 
     /**
-     * 内定操作类
+     * 内定操作类，定义了一些默认操作
+     *
      */
     public class Operation{
         private LinkedBlockingQueue<AbstractProcess> queue;
